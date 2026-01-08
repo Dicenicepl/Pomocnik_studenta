@@ -122,8 +122,7 @@ Idealny jako backend do aplikacji webowej / desktopowej / mobilnej (np. React, V
 {
   "name": "Moodle",
   "url": "https://moodle.edu",
-  "icon": "school",
-  "shortcut": "CTRL+M"
+  "icon": "school"
 }
 ```
 
