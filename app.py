@@ -1,5 +1,8 @@
 from flask import Flask
+
 from database import db
+from models import link
+
 from controllers.links_controller import links_bp
 
 app = Flask(__name__)
