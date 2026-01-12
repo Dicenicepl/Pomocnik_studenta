@@ -7,13 +7,13 @@ from controllers.links_controller import links_bp
 
 app = Flask(__name__)
 
-#Registering outsite controllers
-app.register_blueprint(links_bp)
-
 #URI where to read/create .db file
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 
 db.init_app(app)
+
+#Registering outsite controllers
+app.register_blueprint(links_bp)
 
 #Create all imported tables
 with app.app_context():
