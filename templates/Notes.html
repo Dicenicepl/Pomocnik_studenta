@@ -2,11 +2,155 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notes</title>
+    <style>
+        textarea {
+            width: 90%;
+            height: 40vh;
+            font-size: 16px;
+        }
+        input {
+            width: 50%;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 16px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            white-space: pre-wrap;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to the Notes</h1>
-    <p>This is the notes page.</p>
+
+<h1>📒 Notes</h1>
+
+<h3>Add a note</h3>
+<input id="title" placeholder="Title"><br><br>
+<textarea id="content" placeholder="Content"></textarea><br>
+<button id="addBtn">Add</button>
+
+<hr>
+
+<h3>Your notes</h3>
+<ul id="notes"></ul>
+
+<script>
+let editingId = null;
+
+async function loadNotes() {
+    const response = await fetch("/api/notes");
+    const notes = await response.json();
+
+    const list = document.getElementById("notes");
+    list.innerHTML = "";
+
+    notes.forEach(note => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <b>${note.title}</b><br><br>
+            <pre>${note.content}</pre>
+            <button class="deleteBtn" data-id="${note.id}">Delete</button>
+            <button class="editBtn" data-id="${note.id}" data-title="${encodeURIComponent(note.title)}" data-content="${encodeURIComponent(note.content)}">Edit</button>
+            <hr>
+        `;
+        list.appendChild(li);
+    });
+
+    document.querySelectorAll(".deleteBtn").forEach(btn => {
+        btn.onclick = () => deleteNote(parseInt(btn.dataset.id));
+    });
+
+    document.querySelectorAll(".editBtn").forEach(btn => {
+        btn.onclick = () => editNote(
+            parseInt(btn.dataset.id),
+            decodeURIComponent(btn.dataset.title),
+            decodeURIComponent(btn.dataset.content)
+        );
+    });
+}
+
+async function addNote() {
+    const title = document.getElementById("title").value.trim();
+    const content = document.getElementById("content").value.trim();
+
+    if (!title || !content) {
+        alert("Title and content are required");
+        return;
+    }
+
+    const response = await fetch("/api/notes", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ title, content, format: "markdown" })
+    });
+
+    if (!response.ok) {
+        alert("Error while adding note");
+        return;
+    }
+
+    document.getElementById("title").value = "";
+    document.getElementById("content").value = "";
+    loadNotes();
+}
+
+async function deleteNote(id) {
+    await fetch(`/api/notes/${id}`, { method: "DELETE" });
+    loadNotes();
+}
+
+function editNote(id, title, content) {
+    editingId = id;
+    document.getElementById("title").value = title;
+    document.getElementById("content").value = content;
+
+    const addBtn = document.getElementById("addBtn");
+    addBtn.textContent = "Save";
+    addBtn.onclick = saveNote;
+}
+
+async function saveNote() {
+    const title = document.getElementById("title").value.trim();
+    const content = document.getElementById("content").value.trim();
+
+    if (!title || !content) {
+        alert("Title and content are required");
+        return;
+    }
+
+    
+    const response = await fetch(`/api/notes/${parseInt(editingId)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content, format: "markdown" })
+    });
+
+    if (!response.ok) {
+        alert("Error while saving note");
+        return;
+    }
+
+    document.getElementById("title").value = "";
+    document.getElementById("content").value = "";
+
+    const addBtn = document.getElementById("addBtn");
+    addBtn.textContent = "Add";
+    addBtn.onclick = addNote;
+
+    editingId = null;
+    await loadNotes(); 
+}
+
+
+// Inicjalizacja
+document.getElementById("addBtn").onclick = addNote;
+loadNotes();
+</script>
+
 </body>
 </html>
