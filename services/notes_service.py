@@ -1,4 +1,4 @@
-from models import db, Note
+from models.note import db, Note
 
 def get_all_notes():
     return Note.query.all()

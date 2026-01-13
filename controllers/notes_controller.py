@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, abort
-from models import Note
-from notes_service import (
+from models.note import Note
+from services.notes_service import (
     get_all_notes,
     create_note,
     update_note,
