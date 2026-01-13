@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Notes</title>
+    <style>
+        input, textarea, button {
+            font-size: 16px;
+        }
+
+        input, textarea {
+            width: 90%;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            height: 150px;
+        }
+
+        button {
+            padding: 8px 12px;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>📒 Notes</h1>
+
+<input id="title" placeholder="Title"><br>
+<textarea id="content" placeholder="Content"></textarea><br>
+<button id="mainButton">Add Note</button>
+
+<hr>
+
+<ul id="notesList"></ul>
+
+<script>
+let editingId = null;
+
+function clearForm() {
+    document.getElementById("title").value = "";
+    document.getElementById("content").value = "";
+}
+
+async function loadNotes() {
+    const res = await fetch("/api/notes");
+    const notes = await res.json();
+
+    const list = document.getElementById("notesList");
+    list.innerHTML = "";
+
+    for (let note of notes) {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <b>${note.title}</b>
+            <pre>${note.content}</pre>
+            <button onclick="deleteNote(${note.id})">Delete</button>
+            <button onclick="startEdit(${note.id}, '${note.title.replace(/'/g,"\\'")}', '${note.content.replace(/'/g,"\\'")}')">Edit</button>
+            <hr>
+        `;
+        list.appendChild(li);
+    }
+}
+
+async function addNote() {
+    const title = document.getElementById("title").value.trim();
+    const content = document.getElementById("content").value.trim();
+
+    if (!title || !content) { alert("Title and content required"); return; }
+
+    await fetch("/api/notes", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({title, content, format:"markdown"})
+    });
+
+    clearForm();
+    loadNotes();
+}
+
+async function deleteNote(id) {
+    await fetch("/api/notes/"+id, {method:"DELETE"});
+    loadNotes();
+}
+
+function startEdit(id, title, content) {
+    editingId = id;
+    document.getElementById("title").value = title;
+    document.getElementById("content").value = content;
+    document.getElementById("mainButton").textContent = "Save";
+    document.getElementById("mainButton").onclick = saveEdit;
+}
+
+async function saveEdit() {
+    const title = document.getElementById("title").value.trim();
+    const content = document.getElementById("content").value.trim();
+    if (!title || !content) { alert("Title and content required"); return; }
+
+    await fetch("/api/notes/"+editingId, {
+        method:"PUT",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({title, content, format:"markdown"})
+    });
+
+    editingId = null;
+    clearForm();
+    document.getElementById("mainButton").textContent = "Add Note";
+    document.getElementById("mainButton").onclick = addNote;
+    loadNotes();
+}
+
+
+document.getElementById("mainButton").onclick = addNote;
+loadNotes();
+</script>
+
+</body>
+</html>
