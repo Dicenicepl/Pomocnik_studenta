@@ -1,10 +1,15 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, redirect
+from grades import grades_bp
+from pomodoro import pomodoro_bp
 
 app = Flask(__name__)
 
-@app.route("/")
+app.register_blueprint(grades_bp)
+app.register_blueprint(pomodoro_bp)
+
+@app.route('/')
 def index():
-    return render_template("index.html")
+    return redirect('/grades/')
 
 if __name__ == '__main__':
     app.run(debug=True)
