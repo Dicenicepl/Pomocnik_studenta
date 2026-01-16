@@ -11,16 +11,16 @@ def getAllEvents():
 def getEventById(id:int):
     return calendar_service.getEventById(id)
 
-@calendar_bp.post("/create")
+@calendar_bp.post("/")
 def createEvent():
     data = request.json
     return calendar_service.createEvent(data)
 
-@calendar_bp.put("/update/<int:id>")
+@calendar_bp.put("/<int:id>")
 def updateEvent(id:int):
     data = request.json
     return calendar_service.updateEvent(id, data)
 
-@calendar_bp.delete("/delete/<int:id>")
+@calendar_bp.delete("/<int:id>")
 def deleteEvent(id:int):
     return calendar_service.deleteEvent(id)

@@ -12,15 +12,15 @@ def getLinkById(id:int):
     print("ACTIVE: getLinkById")
     return links_service.getLinkById(id)
 
-@links_bp.post("/create")
+@links_bp.post("/")
 def createLink():
     data = request.json
     return links_service.createLink(data)
-@links_bp.put("/update/<int:id>")
+@links_bp.put("/<int:id>")
 def updateLink(id:int):
     data = request.json
     return links_service.updateLink(id, data)
 
-@links_bp.delete("/delete/<int:id>")
+@links_bp.delete("/<int:id>")
 def deleteLink(id:int):
     return links_service.deleteLink(id)
