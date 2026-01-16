@@ -10,7 +10,7 @@ grades_bp = Blueprint(
     template_folder='templates'
 )
 
-DATABASE = 'baza.db'
+DATABASE = 'database.db'
 
 def get_db():
     conn = sqlite3.connect(DATABASE)
@@ -21,16 +21,16 @@ def init_db():
     conn = get_db()
     c = conn.cursor()
     c.execute('''
-        CREATE TABLE IF NOT EXISTS oceny (
+        CREATE TABLE IF NOT EXISTS grades (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            przedmiot TEXT NOT NULL,
-            wartosc REAL NOT NULL
+            subject TEXT NOT NULL,
+            value REAL NOT NULL
         )
     ''')
     c.execute('''
         CREATE TABLE IF NOT EXISTS pomodoro (
-            data TEXT PRIMARY KEY,
-            minuty INTEGER
+            date TEXT PRIMARY KEY,
+            minutes INTEGER
         )
     ''')
     conn.commit()
@@ -40,77 +40,76 @@ init_db()
 
 def calculate_average(grades):
     if not grades: return 0.0
-    # print(grades)
-    # print(sum(grades))
-    # print(len(grades))
-    # print(sum(grades) / len(grades))
     return round(sum(grades) / len(grades), 2)
 
 @grades_bp.route('/')
 def grades_page():
     conn = get_db()
-    rows = conn.execute('SELECT * FROM oceny').fetchall()
+    rows = conn.execute('SELECT * FROM grades').fetchall()
     conn.close()
 
-    przedmioty_lista = [
-        "Budowa i analiza algorytmów", "Organizacja i architektura systemów",
-        "Matematyka I", "Podstawy programowania Python",
-        "Arkusze kalkulacyjne", "Język obcy"
+    subjects_list = [
+        "Budowa i analiza algorytmów",
+        "Organizacja i architektura systemów",
+        "Matematyka I",
+        "Podstawy programowania Python",
+        "Arkusze kalkulacyjne",
+        "Język obcy"
     ]
 
-    view_data = {p: {'oceny': [], 'srednia': 0.0} for p in przedmioty_lista}
-    wszystkie_oceny = []
+    view_data = {subject: {'grades': [], 'average': 0.0} for subject in subjects_list}
+    all_grades = []
 
     for row in rows:
-        p = row['przedmiot']
-        val = row['wartosc']
-        if p in view_data:
-            view_data[p]['oceny'].append(val)
-            wszystkie_oceny.append(val)
+        subject = row['subject']
+        value = row['value']
+        if subject in view_data:
+            view_data[subject]['grades'].append(value)
+            all_grades.append(value)
     test = 0.0
-    for p in view_data:
-        temp = calculate_average(view_data[p]['oceny'])
-        view_data[p]['srednia'] = temp
-        test += temp
+    for subject in view_data:
+        temp_avg = calculate_average(view_data[subject]['grades'])
+        view_data[subject]['average'] = temp_avg
+        test += temp_avg
 
 
     # srednia_ogolna = calculate_average(wszystkie_oceny)
-    srednia_ogolna = round(test/6, 2)
+    overall_average = round(test/6, 2)
 
-    ilosc_piatek = wszystkie_oceny.count(5.0)
-    ilosc_dwoj = wszystkie_oceny.count(2.0)
-    laczna_ilosc = len(wszystkie_oceny)
+    count_fives = all_grades.count(5.0)
+    count_twos = all_grades.count(2.0)
+    total_count = len(all_grades)
 
     return render_template(
         'grades.html',
-        dziennik=view_data,
-        srednia_ogolna=srednia_ogolna,
-        ilosc_piatek=ilosc_piatek,
-        ilosc_dwoj=ilosc_dwoj,
-        laczna_ilosc=laczna_ilosc
+        gradebook=view_data,
+        overall_average=overall_average,
+        count_fives=count_fives,
+        count_twos=count_twos,
+        total_count=total_count
     )
 
-@grades_bp.route('/dodaj', methods=['POST'])
+@grades_bp.route('/add', methods=['POST'])
 def add_grade():
     try:
-        subject = request.form.get('przedmiot')
-        grade = float(request.form.get('ocena').replace(',', '.'))
+        subject = request.form.get('subject')
+        grade = float(request.form.get('grade').replace(',', '.'))
         if 2.0 <= grade <= 5.0:
             conn = get_db()
-            conn.execute('INSERT INTO oceny (przedmiot, wartosc) VALUES (?, ?)', (subject, grade))
+            conn.execute('INSERT INTO grades (subject, value) VALUES (?, ?)', (subject, grade))
             conn.commit()
             conn.close()
     except:
         pass
     return redirect(url_for('grades.grades_page'))
 
-@grades_bp.route('/usun/<subject>/<int:index>')
+@grades_bp.route('/delete/<subject>/<int:index>')
 def delete_grade(subject, index):
     conn = get_db()
-    rows = conn.execute('SELECT id FROM oceny WHERE przedmiot = ?', (subject,)).fetchall()
+    rows = conn.execute('SELECT id FROM grades WHERE subject = ?', (subject,)).fetchall()
     if 0 <= index < len(rows):
         grade_id = rows[index]['id']
-        conn.execute('DELETE FROM oceny WHERE id = ?', (grade_id,))
+        conn.execute('DELETE FROM grades WHERE id = ?', (grade_id,))
         conn.commit()
     conn.close()
     return redirect(url_for('grades.grades_page'))
@@ -118,24 +117,26 @@ def delete_grade(subject, index):
 @grades_bp.route('/export')
 def export_csv():
     conn = get_db()
-    rows = conn.execute('SELECT * FROM oceny').fetchall()
+    rows = conn.execute('SELECT * FROM grades').fetchall()
     conn.close()
 
     data = {}
+
     for row in rows:
-        p = row['przedmiot']
-        if p not in data: data[p] = []
-        data[p].append(row['wartosc'])
+        subject = row['subject']
+        if subject not in data:
+            data[subject] = []
+        data[subject].append(row['value'])
 
     output = io.StringIO()
     writer = csv.writer(output, delimiter=';')
     writer.writerow(['Przedmiot', 'Oceny', 'Srednia'])
 
-    for subject, grades in data.items():
-        avg = calculate_average(grades)
-        grades_str = ", ".join([str(g) for g in grades])
+    for subject, grades_list in data.items():
+        avg = calculate_average(grades_list)
+        grades_str = ", ".join([str(g) for g in grades_list])
         writer.writerow([subject, grades_str, avg])
 
     return Response('\ufeff' + output.getvalue(),
                     mimetype="text/csv",
-                    headers={"Content-disposition": "attachment; filename=oceny.csv"})
+                    headers={"Content-disposition": "attachment; filename=grades.csv"})
