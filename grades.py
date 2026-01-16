@@ -67,11 +67,16 @@ def grades_page():
         if p in view_data:
             view_data[p]['oceny'].append(val)
             wszystkie_oceny.append(val)
-
+    test = 0.0
     for p in view_data:
-        view_data[p]['srednia'] = calculate_average(view_data[p]['oceny'])
+        temp = calculate_average(view_data[p]['oceny'])
+        view_data[p]['srednia'] = temp
+        test += temp
 
-    srednia_ogolna = calculate_average(wszystkie_oceny)
+
+    # srednia_ogolna = calculate_average(wszystkie_oceny)
+    srednia_ogolna = round(test/6, 2)
+
     ilosc_piatek = wszystkie_oceny.count(5.0)
     ilosc_dwoj = wszystkie_oceny.count(2.0)
     laczna_ilosc = len(wszystkie_oceny)
