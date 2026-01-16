@@ -102,7 +102,7 @@
 
         document.getElementById('status-msg').innerText = "Zapisywanie";
 
-        fetch('/save_pomodoro', {
+        fetch('/pomodoro/save', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({minutes: 5})

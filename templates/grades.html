@@ -8,21 +8,21 @@
     </div>
 
     <div class="col-md-5">
-        {% set cel = 4.75 %}
-        {% set procent = (srednia_ogolna / cel * 100)|int %}
+        {% set goal = 4.75 %}
+        {% set percent = (overall_average / goal * 100)|int %}
 
         <div class="d-flex justify-content-between small text-muted mb-1">
             <span>Stypendium (4.75)</span>
-            <span>{{ procent }}%</span>
+            <span>{{ percent }}%</span>
         </div>
         <div class="progress" style="height: 10px;">
-            <div class="progress-bar {% if srednia_ogolna >= cel %}bg-success{% else %}bg-warning{% endif %}"
-                 role="progressbar" style="width: {{ procent }}%"></div>
+            <div class="progress-bar {% if overall_average >= goal %}bg-success{% else %}bg-warning{% endif %}"
+                 role="progressbar" style="width: {{ percent }}%"></div>
         </div>
         <div class="text-center mt-1">
             <small class="text-muted" style="font-size: 0.75rem;">
-                {% if srednia_ogolna < cel %}
-                    Brakuje: <strong>{{ (cel - srednia_ogolna)|round(2) }}</strong>
+                {% if overall_average < goal %}
+                    Brakuje: <strong>{{ (goal - overall_average)|round(2) }}</strong>
                 {% else %}
                     Gratulacje! Masz stypendium!
                 {% endif %}
@@ -33,8 +33,8 @@
     <div class="col-md-3 d-flex justify-content-end align-items-center gap-2">
         <div class="border rounded px-3 py-2 bg-white shadow-sm text-center">
             <small class="d-block text-muted" style="line-height: 1; font-size: 0.7rem;">ŚREDNIA</small>
-            <span class="fw-bold fs-5 {% if srednia_ogolna >= 4.75 %}text-success{% endif %}">
-                {{ srednia_ogolna }}
+            <span class="fw-bold fs-5 {% if overall_average >= 4.75 %}text-success{% endif %}">
+                {{ overall_average }}
             </span>
         </div>
         <a href="/export" class="btn btn-dark shadow-sm" title="Pobierz CSV">
@@ -55,24 +55,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for przedmiot, dane in dziennik.items() %}
+                    {% for subject, data in gradebook.items() %}
                     <tr>
-                        <td class="fw-bold">{{ przedmiot }}</td>
+                        <td class="fw-bold">{{ subject }}</td>
                         <td>
-                            {% for ocena in dane.oceny %}
+                            {% for grade in data.grades %}
                             <span class="badge bg-light text-dark border me-1">
-                                {{ ocena }}
-                                <a href="{{ url_for('grades.delete_grade', subject=przedmiot, index=loop.index0) }}" class="text-danger text-decoration-none ms-1 opacity-50">&times;</a>
+                                {{ grade }}
+                                <a href="{{ url_for('grades.delete_grade', subject=subject, index=loop.index0) }}" class="text-danger text-decoration-none ms-1 opacity-50">&times;</a>
                             </span>
                             {% endfor %}
                         </td>
                         <td class="text-center">
                             <span class="badge
-                                {% if dane.srednia >= 4.75 %} bg-success
-                                {% elif dane.srednia < 3.0 %} bg-danger
+                                {% if data.average >= 4.75 %} bg-success
+                                {% elif data.average < 3.0 %} bg-danger
                                 {% else %} bg-secondary
                                 {% endif %}">
-                                {{ dane.srednia }}
+                                {{ data.average }}
                             </span>
                         </td>
                     </tr>
@@ -89,15 +89,15 @@
             <form action="{{ url_for('grades.add_grade') }}" method="POST">
                 <div class="mb-3">
                     <label class="form-label small text-muted">Przedmiot</label>
-                    <select name="przedmiot" class="form-select" required>
-                        {% for p in dziennik.keys() %}
-                        <option value="{{ p }}">{{ p }}</option>
+                    <select name="subject" class="form-select" required>
+                        {% for subject in gradebook.keys() %}
+                        <option value="{{ subject }}">{{ subject }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="mb-3">
                     <label class="form-label small text-muted">Ocena</label>
-                    <input type="number" name="ocena" step="0.5" min="2.0" max="5.0" class="form-control" required>
+                    <input type="number" name="grade" step="0.5" min="2.0" max="5.0" class="form-control" required>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Zapisz</button>
             </form>
@@ -108,15 +108,15 @@
             <ul class="list-group list-group-flush small">
                 <li class="list-group-item d-flex justify-content-between px-0">
                     <span>Liczba ocen:</span>
-                    <strong>{{ laczna_ilosc }}</strong>
+                    <strong>{{ total_count }}</strong>
                 </li>
                 <li class="list-group-item d-flex justify-content-between px-0">
                     <span>Piątki (5.0):</span>
-                    <strong class="text-success">{{ ilosc_piatek }}</strong>
+                    <strong class="text-success">{{ count_fives }}</strong>
                 </li>
                 <li class="list-group-item d-flex justify-content-between px-0">
                     <span>Zagrożenia (2.0):</span>
-                    <strong class="text-danger">{{ ilosc_dwoj }}</strong>
+                    <strong class="text-danger">{{ count_twos }}</strong>
                 </li>
             </ul>
         </div>
