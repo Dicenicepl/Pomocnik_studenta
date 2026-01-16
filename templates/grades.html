@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row mb-4 align-items-center">
+    <div class="col-md-4">
+        <h2 class="fw-bold m-0">Twoje Oceny</h2>
+    </div>
+
+    <div class="col-md-5">
+        {% set cel = 4.75 %}
+        {% set procent = (srednia_ogolna / cel * 100)|int %}
+
+        <div class="d-flex justify-content-between small text-muted mb-1">
+            <span>Stypendium (4.75)</span>
+            <span>{{ procent }}%</span>
+        </div>
+        <div class="progress" style="height: 10px;">
+            <div class="progress-bar {% if srednia_ogolna >= cel %}bg-success{% else %}bg-warning{% endif %}"
+                 role="progressbar" style="width: {{ procent }}%"></div>
+        </div>
+        <div class="text-center mt-1">
+            <small class="text-muted" style="font-size: 0.75rem;">
+                {% if srednia_ogolna < cel %}
+                    Brakuje: <strong>{{ (cel - srednia_ogolna)|round(2) }}</strong>
+                {% else %}
+                    Gratulacje! Masz stypendium!
+                {% endif %}
+            </small>
+        </div>
+    </div>
+
+    <div class="col-md-3 d-flex justify-content-end align-items-center gap-2">
+        <div class="border rounded px-3 py-2 bg-white shadow-sm text-center">
+            <small class="d-block text-muted" style="line-height: 1; font-size: 0.7rem;">ŚREDNIA</small>
+            <span class="fw-bold fs-5 {% if srednia_ogolna >= 4.75 %}text-success{% endif %}">
+                {{ srednia_ogolna }}
+            </span>
+        </div>
+        <a href="/export" class="btn btn-dark shadow-sm" title="Pobierz CSV">
+            <i class="fas fa-file-csv"></i>
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card p-4 shadow-sm border">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Przedmiot</th>
+                        <th>Oceny</th>
+                        <th class="text-center">Średnia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for przedmiot, dane in dziennik.items() %}
+                    <tr>
+                        <td class="fw-bold">{{ przedmiot }}</td>
+                        <td>
+                            {% for ocena in dane.oceny %}
+                            <span class="badge bg-light text-dark border me-1">
+                                {{ ocena }}
+                                <a href="{{ url_for('grades.delete_grade', subject=przedmiot, index=loop.index0) }}" class="text-danger text-decoration-none ms-1 opacity-50">&times;</a>
+                            </span>
+                            {% endfor %}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge
+                                {% if dane.srednia >= 4.75 %} bg-success
+                                {% elif dane.srednia < 3.0 %} bg-danger
+                                {% else %} bg-secondary
+                                {% endif %}">
+                                {{ dane.srednia }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+
+        <div class="card p-4 mb-4 shadow-sm border">
+            <h5 class="fw-bold mb-3">Dodaj ocenę</h5>
+            <form action="{{ url_for('grades.add_grade') }}" method="POST">
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Przedmiot</label>
+                    <select name="przedmiot" class="form-select" required>
+                        {% for p in dziennik.keys() %}
+                        <option value="{{ p }}">{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Ocena</label>
+                    <input type="number" name="ocena" step="0.5" min="2.0" max="5.0" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Zapisz</button>
+            </form>
+        </div>
+
+        <div class="card p-4 shadow-sm border">
+            <h5 class="fw-bold mb-3">Statystyki</h5>
+            <ul class="list-group list-group-flush small">
+                <li class="list-group-item d-flex justify-content-between px-0">
+                    <span>Liczba ocen:</span>
+                    <strong>{{ laczna_ilosc }}</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between px-0">
+                    <span>Piątki (5.0):</span>
+                    <strong class="text-success">{{ ilosc_piatek }}</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between px-0">
+                    <span>Zagrożenia (2.0):</span>
+                    <strong class="text-danger">{{ ilosc_dwoj }}</strong>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
