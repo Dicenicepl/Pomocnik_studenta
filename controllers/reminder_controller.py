@@ -25,7 +25,7 @@ def delete(id):
 @reminders_bp.get("/check")
 def check():
     now = datetime.now()
-    future = now + timedelta(minutes=5)
+    future = now + timedelta(minutes=3)
 
     reminders = reminder_repository.getPendingBetween(now, future)
 

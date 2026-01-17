@@ -18,7 +18,7 @@ function showNotification(text) {
 
     setTimeout(() => {
         box.remove();
-    }, 6000);
+    }, 10000);
 }
 
 
@@ -41,6 +41,6 @@ async function checkReminders() {
 }
 
 
-setInterval(checkReminders, 60000);
+setInterval(checkReminders, 10000);
 
 checkReminders();
