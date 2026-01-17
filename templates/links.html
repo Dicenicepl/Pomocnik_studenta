@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Linki</title>
+</head>
+<body>
+
+<h1>Linki</h1>
+
+<h2>Dodaj link</h2>
+<form method="POST" action="/links/create">
+    <input name="name" placeholder="Nazwa" required>
+    <input name="url" placeholder="URL" required>
+    <button type="submit">Dodaj</button>
+</form>
+
+<hr>
+
+<ul>
+{% for link in links %}
+    <li>
+        <a href="{{ link.url }}" target="_blank">{{ link.name }}</a>
+
+        <!-- UPDATE -->
+        <form method="POST" action="/links/update/{{ link.id }}" style="display:inline">
+            <input name="name" value="{{ link.name }}">
+            <input name="url" value="{{ link.url }}">
+            <button type="submit">Zapisz</button>
+        </form>
+
+        <!-- DELETE -->
+        <form method="POST" action="/links/delete/{{ link.id }}" style="display:inline">
+            <button type="submit">Usuń</button>
+        </form>
+    </li>
+{% else %}
+    <li>Brak linków</li>
+{% endfor %}
+</ul>
+
+</body>
+</html>

@@ -7,7 +7,8 @@ def getAllLinks():
 def getLinkById(id: int):
     return Link.query.filter(Link.id == id).first()
 
-def createLink(link: Link):
+def createLink(data):
+    link = Link(name = data["name"], url = data["url"])
     db.session.add(link)
     db.session.commit()
     return link

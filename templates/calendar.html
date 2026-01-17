@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Kalendarz</title>
+</head>
+<body>
+
+<h1>Kalendarz</h1>
+
+<h2>Dodaj wydarzenie</h2>
+<form method="POST" action="/calendar/create">
+    <input name="title" placeholder="Tytuł" required>
+    <input name="type" placeholder="Typ" required>
+
+    <label>Start</label>
+    <input type="datetime-local" name="start" required>
+
+    <label>Koniec</label>
+    <input type="datetime-local" name="end" required>
+
+    <input name="location" placeholder="Lokalizacja" required>
+    <textarea name="description" placeholder="Opis" required></textarea>
+
+    <button type="submit">Dodaj</button>
+</form>
+
+<hr>
+
+<ul>
+{% for e in events %}
+    <li>
+        <strong>{{ e.title }}</strong><br>
+        {{ e.start }} → {{ e.end }}<br>
+        {{ e.location }}<br>
+        {{ e.description }}
+
+        <!-- UPDATE -->
+        <form method="POST" action="/calendar/update/{{ e.id }}">
+            <input name="title" value="{{ e.title }}">
+            <input name="type" value="{{ e.type }}">
+
+            <input type="datetime-local" name="start"
+                   value="{{ e.start[:16] }}">
+            <input type="datetime-local" name="end"
+                   value="{{ e.end[:16] }}">
+
+            <input name="location" value="{{ e.location }}">
+            <textarea name="description">{{ e.description }}</textarea>
+
+            <button type="submit">Zapisz</button>
+        </form>
+
+        <!-- DELETE -->
+        <form method="POST" action="/calendar/delete/{{ e.id }}">
+            <button type="submit">Usuń</button>
+        </form>
+    </li>
+{% else %}
+    <li>Brak wydarzeń</li>
+{% endfor %}
+</ul>
+
+</body>
+</html>
