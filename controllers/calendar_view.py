@@ -5,10 +5,15 @@ from services import calendar_service
 calendar_view = Blueprint("calendar_view", __name__)
 
 @calendar_view.get("/calendar")
-def calendar_page():
-    response, _ = calendar_service.getAllEvents()
-    events = response.json
-    return render_template("calendar.html", events=events)
+def page():
+    events = calendar_service.getAllEvents()[0].json
+    edit_id = request.args.get("edit", type=int)
+
+    return render_template(
+        "calendar.html",
+        events=events,
+        edit_id=edit_id
+    )
 
 
 @calendar_view.post("/calendar/create")
