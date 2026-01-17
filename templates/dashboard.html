@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboardo</title>
+
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #f4f6f8;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 25px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 8px 20px rgba(0,0,0,.08);
+            text-decoration: none;
+            color: black;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,.12);
+        }
+
+        .icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .desc {
+            font-size: .9em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>📊 Dashboardo</h1>
+
+<div class="grid">
+
+    <a href="/links" class="card">
+        <div class="icon">🔗</div>
+        <div class="title">Linki</div>
+        <div class="desc">Zarządzanie linkami</div>
+    </a>
+
+    <a href="/calendar" class="card">
+        <div class="icon">📅</div>
+        <div class="title">Kalendarz</div>
+        <div class="desc">Wydarzenia i planowanie</div>
+    </a>
+
+     <a href="/pomodoro" class="card">
+        <div class="icon">🍅</div>
+        <div class="title">Pomodoro</div>
+        <div class="desc">Sesja do nauki</div>
+    </a>
+
+     <a href="/grades" class="card">
+        <div class="icon">🔢</div>
+        <div class="title">Oceny</div>
+        <div class="desc">Zapisz oceny</div>
+    </a>
+    <a href="/" class="card">
+        <div class="icon"></div>
+        <div class="title"></div>
+        <div class="desc"></div>
+    </a>
+    <!-- example to how create new link with same style and data, on mac ctr+comma+spacebar, win: win+.-->
+    <!--
+    <a href="/<endpoint>" class="card">
+        <div class="icon"></div>
+        <div class="title"></div>
+        <div class="desc"></div>
+    </a>
+    -->
+
+</div>
+
+</div>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 
 from database import db
 from models.note import Note
@@ -29,10 +29,13 @@ app.register_blueprint(calendar_view)
 app.register_blueprint(pomodoro_bp)
 app.register_blueprint(grades_bp)
 
+@app.get("/")
+def dashboard():
+    return render_template("dashboard.html")
 
 #Create all imported tables
 with app.app_context():
     db.create_all()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="192.168.1.189")
