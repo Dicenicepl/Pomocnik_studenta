@@ -1,15 +1,16 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from services import links_service
 
-links_view = Blueprint("links_view", __name__)
+links_view = Blueprint("links_view", __name__, url_prefix="/links")
 
-@links_view.get("/links")
+
+@links_view.get("/")
 def links_page():
-    links = links_service.getAllLinks()[0].json
-    return render_template("links.html", links=links)
+    response, _ = links_service.getAllLinks()
+    return render_template("links.html", links=response.json)
 
 
-@links_view.post("/links/create")
+@links_view.post("/create")
 def create_link():
     data = {
         "name": request.form["name"],
@@ -19,7 +20,7 @@ def create_link():
     return redirect(url_for("links_view.links_page"))
 
 
-@links_view.post("/links/update/<int:id>")
+@links_view.post("/update/<int:id>")
 def update_link(id):
     data = {
         "name": request.form["name"],
@@ -29,7 +30,7 @@ def update_link(id):
     return redirect(url_for("links_view.links_page"))
 
 
-@links_view.post("/links/delete/<int:id>")
+@links_view.post("/delete/<int:id>")
 def delete_link(id):
     links_service.deleteLink(id)
     return redirect(url_for("links_view.links_page"))

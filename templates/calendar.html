@@ -3,63 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <title>Kalendarz</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #f4f6f8;
+            padding: 30px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        form {
+            display: grid;
+            gap: 10px;
+        }
+
+        input, textarea, button {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+            border: none;
+        }
+
+        button.danger {
+            background: #dc2626;
+        }
+
+        button.secondary {
+            background: #6b7280;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .meta {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        hr {
+            margin: 30px 0;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Kalendarz</h1>
+<div class="container">
 
-<h2>Dodaj wydarzenie</h2>
-<form method="POST" action="/calendar/create">
-    <input name="title" placeholder="Tytuł" required>
-    <input name="type" placeholder="Typ" required>
+<h1>📅 Kalendarz</h1>
 
-    <label>Start</label>
-    <input type="datetime-local" name="start" required>
+<div class="card">
+    <h2>Dodaj wydarzenie</h2>
+    <form method="POST" action="/calendar/create">
+        <input name="title" placeholder="Tytuł" required>
+        <input name="type" placeholder="Typ" required>
+        <label>Start</label>
+        <input type="datetime-local" name="start" required>
+        <label>Koniec</label>
+        <input type="datetime-local" name="end" required>
+        <input name="location" placeholder="Lokalizacja" required>
+        <textarea name="description" placeholder="Opis" required></textarea>
 
-    <label>Koniec</label>
-    <input type="datetime-local" name="end" required>
-
-    <input name="location" placeholder="Lokalizacja" required>
-    <textarea name="description" placeholder="Opis" required></textarea>
-
-    <button type="submit">Dodaj</button>
-</form>
+        <button type="submit">Dodaj</button>
+    </form>
+</div>
 
 <hr>
 
-<ul>
 {% for e in events %}
-    <li>
-        <strong>{{ e.title }}</strong><br>
-        {{ e.start }} → {{ e.end }}<br>
-        {{ e.location }}<br>
-        {{ e.description }}
+<div class="card">
 
-        <!-- UPDATE -->
+    {% if edit_id == e.id %}
+        <h3>✏️ Edycja wydarzenia</h3>
         <form method="POST" action="/calendar/update/{{ e.id }}">
             <input name="title" value="{{ e.title }}">
             <input name="type" value="{{ e.type }}">
 
-            <input type="datetime-local" name="start"
-                   value="{{ e.start[:16] }}">
-            <input type="datetime-local" name="end"
-                   value="{{ e.end[:16] }}">
+            <label>Start</label>
+            <input type="datetime-local" name="start" value="{{ e.start[:16] }}">
+
+            <label>Koniec</label>
+            <input type="datetime-local" name="end" value="{{ e.end[:16] }}">
 
             <input name="location" value="{{ e.location }}">
             <textarea name="description">{{ e.description }}</textarea>
 
-            <button type="submit">Zapisz</button>
+            <div class="actions">
+                <button type="submit">Zapisz</button>
+                <a href="/calendar">
+                    <button type="button" class="secondary">Anuluj</button>
+                </a>
+            </div>
         </form>
 
-        <!-- DELETE -->
-        <form method="POST" action="/calendar/delete/{{ e.id }}">
-            <button type="submit">Usuń</button>
-        </form>
-    </li>
+    {% else %}
+        <div class="card-header">
+            <strong>{{ e.title }}</strong>
+            <span class="meta">{{ e.type }}</span>
+        </div>
+
+        <div class="meta">
+            {{ e.start }} → {{ e.end }}<br>
+            📍 {{ e.location }}
+        </div>
+
+        <p>{{ e.description }}</p>
+
+        <div class="actions">
+            <a href="/calendar?edit={{ e.id }}">
+                <button class="secondary">Edytuj</button>
+            </a>
+
+            <form method="POST" action="/calendar/delete/{{ e.id }}">
+                <button class="danger">Usuń</button>
+            </form>
+        </div>
+    {% endif %}
+
+</div>
 {% else %}
-    <li>Brak wydarzeń</li>
+    <p>Brak wydarzeń</p>
 {% endfor %}
-</ul>
+
+</div>
 
 </body>
 </html>

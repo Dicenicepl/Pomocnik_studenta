@@ -3,41 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <title>Linki</title>
+
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #f4f6f8;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,.05);
+        }
+
+        h1, h2 {
+            margin-bottom: 10px;
+        }
+
+        form {
+            display: grid;
+            gap: 10px;
+        }
+
+        input, button {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button.danger {
+            background: #dc2626;
+        }
+
+        .url {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Linki</h1>
+<div class="container">
 
-<h2>Dodaj link</h2>
-<form method="POST" action="/links/create">
-    <input name="name" placeholder="Nazwa" required>
-    <input name="url" placeholder="URL" required>
-    <button type="submit">Dodaj</button>
-</form>
+<h1>🔗 Linki</h1>
 
-<hr>
+<!-- CREATE -->
+<div class="card">
+    <h2>Dodaj link</h2>
+    <form method="POST" action="/links/create">
+        <input name="name" placeholder="Nazwa" required>
+        <input name="url" placeholder="URL" required>
+        <button type="submit">Dodaj</button>
+    </form>
+</div>
 
-<ul>
-{% for link in links %}
-    <li>
-        <a href="{{ link.url }}" target="_blank">{{ link.name }}</a>
+<!-- LIST -->
+{% for l in links %}
+<div class="card">
 
-        <!-- UPDATE -->
-        <form method="POST" action="/links/update/{{ link.id }}" style="display:inline">
-            <input name="name" value="{{ link.name }}">
-            <input name="url" value="{{ link.url }}">
+    <strong>{{ l.name }}</strong>
+    <div class="url">
+        <a href="{{ l.url }}" target="_blank">{{ l.url }}</a>
+    </div>
+
+    <!-- UPDATE -->
+    <form method="POST" action="/links/update/{{ l.id }}">
+        <input name="name" value="{{ l.name }}">
+        <input name="url" value="{{ l.url }}">
+
+        <div class="actions">
             <button type="submit">Zapisz</button>
-        </form>
+        </div>
+    </form>
 
-        <!-- DELETE -->
-        <form method="POST" action="/links/delete/{{ link.id }}" style="display:inline">
-            <button type="submit">Usuń</button>
-        </form>
-    </li>
+    <!-- DELETE -->
+    <form method="POST" action="/links/delete/{{ l.id }}">
+        <button class="danger">Usuń</button>
+    </form>
+
+</div>
 {% else %}
-    <li>Brak linków</li>
+<p>Brak linków</p>
 {% endfor %}
-</ul>
+
+</div>
 
 </body>
 </html>
