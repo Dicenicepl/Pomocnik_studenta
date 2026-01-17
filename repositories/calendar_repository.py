@@ -2,7 +2,7 @@ from database import db
 from models.calendar import Calendar
 
 def getAll():
-    return Calendar.query.all()
+    return Calendar.query.order_by(Calendar.start).all()
 
 def getById(id: int):
     return Calendar.query.filter(Calendar.id == id).first()
