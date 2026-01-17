@@ -1,0 +1,24 @@
+<h1>⏰ Przypomnienia</h1>
+
+<div class="card">
+<form method="POST" action="/reminders/create">
+    <input name="task_id" placeholder="Task ID" required>
+    <input type="datetime-local" name="notify_at" required>
+    <input name="type" value="push">
+    <button>Dodaj</button>
+</form>
+</div>
+
+{% for r in reminders %}
+<div class="card">
+    <strong>Task #{{ r.task_id }}</strong><br>
+    {{ r.notify_at }}<br>
+    Typ: {{ r.type }}
+
+    <form method="POST" action="/reminders/delete/{{ r.id }}">
+        <button class="danger">Usuń</button>
+    </form>
+</div>
+{% else %}
+<p>Brak przypomnień</p>
+{% endfor %}
