@@ -32,7 +32,7 @@ def create_event():
     }
 
     calendar_service.createEvent(data)
-    return redirect(url_for("calendar_view.calendar_page"))
+    return redirect(url_for("calendar_view.page"))
 
 
 @calendar_view.post("/calendar/update/<int:id>")
@@ -51,10 +51,10 @@ def update_event(id: int):
     }
 
     calendar_service.updateEvent(id, data)
-    return redirect(url_for("calendar_view.calendar_page"))
+    return redirect(url_for("calendar_view.page"))
 
 
 @calendar_view.post("/calendar/delete/<int:id>")
 def delete_event(id: int):
     calendar_service.deleteEvent(id)
-    return redirect(url_for("calendar_view.calendar_page"))
+    return redirect(url_for("calendar_view.page"))

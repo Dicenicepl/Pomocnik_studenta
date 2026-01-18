@@ -1,6 +1,5 @@
 from models.reminder import Reminder
 from database import db
-from datetime import datetime
 
 def getAll():
     return Reminder.query.all()

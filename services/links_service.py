@@ -1,5 +1,4 @@
 from repositories import links_repository
-from models.link import Link
 from flask import jsonify
 
 def getAllLinks():

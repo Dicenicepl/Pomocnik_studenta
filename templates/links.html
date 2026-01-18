@@ -64,12 +64,12 @@
     </style>
 </head>
 <body>
+<a href="/">back</a>
 
 <div class="container">
 
 <h1>🔗 Linki</h1>
 
-<!-- CREATE -->
 <div class="card">
     <h2>Dodaj link</h2>
     <form method="POST" action="/links/create">
@@ -79,7 +79,6 @@
     </form>
 </div>
 
-<!-- LIST -->
 {% for l in links %}
 <div class="card">
 
@@ -88,7 +87,6 @@
         <a href="{{ l.url }}" target="_blank">{{ l.url }}</a>
     </div>
 
-    <!-- UPDATE -->
     <form method="POST" action="/links/update/{{ l.id }}">
         <input name="name" value="{{ l.name }}">
         <input name="url" value="{{ l.url }}">
@@ -98,7 +96,6 @@
         </div>
     </form>
 
-    <!-- DELETE -->
     <form method="POST" action="/links/delete/{{ l.id }}">
         <button class="danger">Usuń</button>
     </form>
